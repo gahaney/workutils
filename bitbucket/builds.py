@@ -17,9 +17,10 @@ port = None
 if path.exists(CONFIG_YML):
   with open (CONFIG_YML, 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-  user = cfg['User']
-  host = cfg['Server']['Hostname']
-  port = cfg['Server']['Port']
+  if 'User' in cfg.keys(): user = cfg['User']
+  if 'Server' in cfg.keys():
+    if 'Hostname' in cfg['Server'].keys(): host = cfg['Server']['Hostname']
+    if 'Port' in cfg['Server'].keys(): port = cfg['Server']['Port']
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-u', '--user', default='', help='User name')
@@ -42,11 +43,11 @@ if user==None or host==None or commit==None:
 os.system("stty -echo")
 password = input("Enter your password: ")
 os.system("stty echo")
+print()
 
-url = 'http://' + host
+url = 'https://' + host
 if port!=None: url += ':' + str(port)
 url += API + commit
-
 r = requests.get(url = url, auth=(user, password))
 builds = r.json()
 
